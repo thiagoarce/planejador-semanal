@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
+import database from '../firebase';
+import {ref, set, get } from "firebase/database";
 import Button from '@mui/material/Button';
 import SaveIcon from '@mui/icons-material/Save';
 import "./CalendarStyles.css";
@@ -36,6 +38,7 @@ class Calendar extends Component {
     this.calendarRef = React.createRef();
     this.deletarSemana = this.deletarSemana.bind(this);
     this.repetirSemanaAnterior = this.repetirSemanaAnterior.bind(this);
+    this.salvar = this.salvar.bind(this);
     this.state = {
       viewType: "Week",
       durationBarVisible: false,
@@ -173,14 +176,30 @@ class Calendar extends Component {
     actualEvents.forEach(e => this.calendar.events.remove(e));
   }
 
-  componentDidMount() {
+  salvar(){
+    //() => localStorage.setItem('eventos', JSON.stringify(this.calendar.events.list))
+    const dbRef = ref(database, 'eventos');
+    set (dbRef, JSON.stringify(this.calendar.events.list))
+  }
 
-    const events = JSON.parse(localStorage.getItem('eventos'));
+  componentDidMount() {
+    const dbRef = ref(database, 'eventos');
+    get(dbRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const events = JSON.parse(snapshot.val());
+        const startDate = currentDate;
+        this.calendar.update({startDate, events});
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+    
+    //JSON.parse(localStorage.getItem('eventos'));
     //require("./events.json")
 
-    const startDate = currentDate;
 
-    this.calendar.update({startDate, events});
     
   }
 
@@ -203,7 +222,7 @@ class Calendar extends Component {
           />
         </div>
         <div style={styles.main}>
-        <Button variant="contained" onClick={() => localStorage.setItem('eventos', JSON.stringify(this.calendar.events.list))}><SaveIcon /></Button> 
+        <Button variant="contained" onClick={this.salvar}><SaveIcon /></Button> 
         <Button variant="contained" onClick={this.repetirSemanaAnterior}>Repetir semana anterior</Button>
         <Button variant="contained" onClick={this.deletarSemana}>Deletar semana</Button>
           <DayPilotCalendar
