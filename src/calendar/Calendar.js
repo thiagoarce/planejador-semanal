@@ -18,6 +18,15 @@ const styles = {
   }
 };
 
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
 let currentDate = new Date().toJSON().slice(0, 10)
 
 class Calendar extends Component {
@@ -25,7 +34,8 @@ class Calendar extends Component {
   constructor(props) {
     super(props);
     this.calendarRef = React.createRef();
-    this.repetir = this.repetir.bind(this);
+    this.deletarSemana = this.deletarSemana.bind(this);
+    this.repetirSemanaAnterior = this.repetirSemanaAnterior.bind(this);
     this.state = {
       viewType: "Week",
       durationBarVisible: false,
@@ -82,6 +92,11 @@ class Calendar extends Component {
             color: null,
             onClick: args => this.updateColor(args.source, args.item.color)
           },
+          {
+            text: "Random",
+            color: getRandomColor(),
+            onClick: args => this.updateColor(args.source, getRandomColor())
+          },
 
         ]
       }), 
@@ -134,11 +149,10 @@ class Calendar extends Component {
     this.calendar.events.update(e);
   }
 
-  repetir(){
+  repetirSemanaAnterior(){
     const events = this.calendar.events.list
     const previousWeek = this.calendar.startDate.weekNumber() - 1
     const previousEvents = events.filter(event => event.start.weekNumber() == previousWeek)
-    console.log(events)
     previousEvents.forEach(args => {
       let newEvent = new DayPilot.Event({
         start: args.start.addDays(7),
@@ -150,7 +164,13 @@ class Calendar extends Component {
       if (args.backColor){this.updateColor(newEvent, args.backColor)}
       this.calendar.events.add(newEvent);
     }) 
-    
+  }
+
+  deletarSemana(){
+    const events = this.calendar.events.list
+    const actualWeek = this.calendar.startDate.weekNumber()
+    const actualEvents = events.filter(event => event.start.weekNumber() == actualWeek)
+    actualEvents.forEach(e => this.calendar.events.remove(e));
   }
 
   componentDidMount() {
@@ -187,7 +207,8 @@ class Calendar extends Component {
         </div>
         <div style={styles.main}>
         <Button variant="contained" onClick={() => localStorage.setItem('eventos', JSON.stringify(this.calendar.events.list))}><SaveIcon /></Button> 
-        <Button variant="contained" onClick={this.repetir}>Repetir semana anterior</Button>
+        <Button variant="contained" onClick={this.repetirSemanaAnterior}>Repetir semana anterior</Button>
+        <Button variant="contained" onClick={this.deletarSemana}>Deletar semana</Button>
           <DayPilotCalendar
             {...this.state}
             ref={this.calendarRef}
