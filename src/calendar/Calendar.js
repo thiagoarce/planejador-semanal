@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
-import IconButton from '@mui/material/Button';
+import Button from '@mui/material/Button';
 import SaveIcon from '@mui/icons-material/Save';
 import "./CalendarStyles.css";
 import "./MonthStyles.css";
@@ -171,7 +171,8 @@ class Calendar extends Component {
           />
         </div>
         <div style={styles.main}>
-        <IconButton variant="contained" ><SaveIcon /></IconButton>
+        <Button variant="contained" onClick={() => localStorage.setItem('eventos', JSON.stringify(this.calendar.events.list))}><SaveIcon /></Button> 
+        <Button variant="contained">Repetir semana anterior</Button>
           <DayPilotCalendar
             {...this.state}
             ref={this.calendarRef}
