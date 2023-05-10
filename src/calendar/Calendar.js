@@ -4,6 +4,9 @@ import database from '../firebase';
 import {ref, set, get } from "firebase/database";
 import Button from '@mui/material/Button';
 import SaveIcon from '@mui/icons-material/Save';
+import RepeatOneIcon from '@mui/icons-material/RepeatOne';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import "./CalendarStyles.css";
 import "./MonthStyles.css";
 import "./icons/style.css";
@@ -17,8 +20,14 @@ const styles = {
   },
   main: {
     flexGrow: "1"
+  },
+  mobile: {
+    display: "flex",
+    justifyContent: "center",
   }
 };
+
+
 
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
@@ -40,7 +49,7 @@ class Calendar extends Component {
     this.repetirSemanaAnterior = this.repetirSemanaAnterior.bind(this);
     this.salvar = this.salvar.bind(this);
     this.state = {
-      viewType: "Week",
+      viewType: window.innerWidth <= 600 ? "Day" :"Week",
       durationBarVisible: false,
       timeRangeSelectedHandling: "Enabled",
       cellDuration: 15,
@@ -54,6 +63,8 @@ class Calendar extends Component {
           args.data.barColor = DayPilot.ColorUtil.darker(args.data.backColor, -1);
         }
       },
+    tapAndHoldTimeout: 200,
+    eventTapAndHoldHandling: "ContextMenu",
      contextMenu: new DayPilot.Menu({
         items: [
           {
@@ -138,7 +149,8 @@ class Calendar extends Component {
           this.updateColor(newEvent, args.e.data.backColor)
           dp.events.add(newEvent);  
           args.preventDefault(); // prevent the default action - moving event to the new location
-        } 
+        }
+        
       }
     };
   }
@@ -205,13 +217,18 @@ class Calendar extends Component {
 
   render() {
     return (
-      <div style={styles.wrap}>
-        <div style={styles.left}>
+      <div style={window.innerWidth > 600 ? styles.wrap : styles.none}>
+        <div style={window.innerWidth > 600 ? styles.left : styles.mobile}>
+        <ButtonGroup variant="contained" orientation={window.innerWidth > 600 ?"horizontal":"vertical"} aria-label="outlined primary button group">
+        <Button variant="contained" onClick={this.salvar}><SaveIcon /></Button>
+        <Button variant="contained" onClick={this.repetirSemanaAnterior}><RepeatOneIcon /></Button>
+        <Button variant="contained" onClick={this.deletarSemana}><DeleteSweepIcon /></Button>
+        </ButtonGroup>
           <DayPilotNavigator
             locale={"pt-br"}
             selectMode={"week"}
-            showMonths={3}
-            skipMonths={3}
+            showMonths={window.innerWidth <= 600 ? 1 : 3}
+            skipMonths={window.innerWidth <= 600 ? 1 : 3}
             startDate={currentDate}
             selectionDay={currentDate}
             onTimeRangeSelected={ args => {
@@ -221,14 +238,10 @@ class Calendar extends Component {
             }}
           />
         </div>
-        <div style={styles.main}>
-        <Button variant="contained" onClick={this.salvar}><SaveIcon /></Button> 
-        <Button variant="contained" onClick={this.repetirSemanaAnterior}>Repetir semana anterior</Button>
-        <Button variant="contained" onClick={this.deletarSemana}>Deletar semana</Button>
+        <div style={window.innerWidth > 600 ? styles.main : styles.none}>
           <DayPilotCalendar
             {...this.state}
-            ref={this.calendarRef}
-            
+            ref={this.calendarRef}  
           />
         </div>
       </div>
