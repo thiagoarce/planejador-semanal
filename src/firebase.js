@@ -7,13 +7,13 @@ import "firebase/database";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBiDsWpz0J_X4rPsQYUJcUyLVazRtiA8dk",
-  authDomain: "planejador-semanal.firebaseapp.com",
-  projectId: "planejador-semanal",
-  storageBucket: "planejador-semanal.appspot.com",
-  messagingSenderId: "1059522956155",
-  appId: "1:1059522956155:web:02bc9030ff589be44b8bde",
-  databaseURL: "https://planejador-semanal-default-rtdb.firebaseio.com"
+  apiKey: " ",
+  authDomain: " ",
+  projectId: " ",
+  storageBucket: " ",
+  messagingSenderId: " ",
+  appId: " ",
+  databaseURL: " "
 };
 
 // Initialize Firebase
